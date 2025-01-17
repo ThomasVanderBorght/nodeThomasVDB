@@ -24,12 +24,11 @@ console.log("Connecting to MySQL...");
 db.connect(err => {
     if (err) {
         console.error("MySQL Connection Failed:", err);
-        process.exit(1);  // Exit if MySQL connection fails
+        process.exit(1); 
     }
     console.log("Connected to MySQL Database");
 });
 
-// Test a query
 db.query('SELECT 1', (err, result) => {
     if (err) {
         console.error("Test Query Failed:", err);

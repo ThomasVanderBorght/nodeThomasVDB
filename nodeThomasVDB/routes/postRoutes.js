@@ -105,7 +105,6 @@ router.get('/search/title',  authenticateToken, (req, res) => {
     });
 });
 
-// Search by category and title
 router.get('/search/category/title',  authenticateToken, (req, res) => {
     const { category, title } = req.query;
 
