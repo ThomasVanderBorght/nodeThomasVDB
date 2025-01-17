@@ -38,6 +38,8 @@ JWT_SECRET= 6270c809d9a61ee54a498b0f6470cd790eaa50ca2f117f46ffb31a20991925ae0679
 Make sure to create a database and add the schenae.sql file to it using 
 mysql -u root -p your_database_name < schema.sql
 
+There is no standard data added, this will first need to be created.
+
 to start the project use 
 npm start
 
