@@ -1,11 +1,16 @@
 require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
+const userRoutes = require('./routes/userRoutes');
+const postRoutes = require('./routes/postRoutes');
 
 console.log("Starting the server...");
 
 const app = express();
 app.use(express.json());
+
+app.use('/users', userRoutes);
+app.use('/posts', postRoutes);
 
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -21,7 +26,7 @@ db.connect(err => {
         console.error("MySQL Connection Failed:", err);
         process.exit(1);  // Exit if MySQL connection fails
     }
-    console.log("Connected to MySQL Database ✅");
+    console.log("Connected to MySQL Database");
 });
 
 // Test a query
@@ -32,11 +37,6 @@ db.query('SELECT 1', (err, result) => {
         console.log("Test Query Successful", result);
     }
 });
-
-const userRoutes = require('./routes/userRoutes');
-const postRoutes = require('./routes/postRoutes');
-app.use('/users', userRoutes);
-app.use('/posts', postRoutes);
 
 
 app.get('/', (req, res) => {

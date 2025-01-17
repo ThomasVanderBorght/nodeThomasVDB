@@ -20,6 +20,7 @@ router.get('/', authenticateToken, (req, res) => {
             res.json(results);
         }
     );
+
 });
 
 router.get('/:id',authenticateToken, (req, res) => {
@@ -30,7 +31,7 @@ router.get('/:id',authenticateToken, (req, res) => {
     });
 });
 
-router.post('/',authenticateToken, (req, res) => {
+router.post('/create',authenticateToken, (req, res) => {
     const { title, content, category, author_id } = req.body;
     if (!title || !content || !category || !author_id) {
         return res.status(400).json({ message: "All fields are required" });
@@ -45,7 +46,7 @@ router.post('/',authenticateToken, (req, res) => {
     );
 });
 
-router.put('/:id', authenticateToken,(req, res) => {
+router.put('/update/:id', authenticateToken,(req, res) => {
     const { title, content, category } = req.body;
     db.query('UPDATE posts SET title=?, content=?, category=? WHERE id=?',
         [title, content, category, req.params.id],
@@ -56,33 +57,72 @@ router.put('/:id', authenticateToken,(req, res) => {
     );
 });
 
-router.delete('/:id', authenticateToken, (req, res) => {
+router.delete('/delete/:id', authenticateToken, (req, res) => {
     db.query('DELETE FROM posts WHERE id = ?', [req.params.id], (err, results) => {
         if (err) return res.status(500).json(err);
         res.json({ message: 'Post deleted successfully' });
     });
 });
 
-router.get('/search/:category', authenticateToken,(req, res) => {
-    const { title, category } = req.query;
+router.get('/search/category', authenticateToken, (req, res) => {
+    const { category } = req.query;
 
-    let query = 'SELECT * FROM posts WHERE 1=1';
-    const params = [];
-
-    if (title) {
-        query += ' AND title LIKE ?';
-        params.push(`%${title}%`);
+    if (!category) {
+        return res.status(400).json({ message: 'Category is required.' });
     }
 
-    if (category) {
-        query += ' AND category LIKE ?';
-        params.push(`%${category}%`);
-    }
+    const query = 'SELECT * FROM posts WHERE LOWER(category) LIKE ?';
+    const params = [`%${category.toLowerCase()}%`];
 
     db.query(query, params, (err, results) => {
-        if (err) return res.status(500).json(err);
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json(err);
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'No posts found for the given category.' });
+        }
+
         res.json(results);
     });
 });
+
+router.get('/search/title',  authenticateToken, (req, res) => {
+    const { title } = req.query;
+
+    if (!title) {
+        return res.status(400).json({ message: 'Title is required.' });
+    }
+
+    const query = 'SELECT * FROM posts WHERE LOWER(title) LIKE ?';
+    const params = [`%${title.toLowerCase()}%`];
+
+    db.query(query, params, (err, results) => {
+        if (err) return res.status(500).json(err);
+        if (results.length === 0) return res.status(404).json({ message: 'No posts found for the given title.' });
+        res.json(results);
+    });
+});
+
+// Search by category and title
+router.get('/search/category/title',  authenticateToken, (req, res) => {
+    const { category, title } = req.query;
+
+    if (!category || !title) {
+        return res.status(400).json({ message: 'Both category and title are required.' });
+    }
+
+    const query = 'SELECT * FROM posts WHERE LOWER(category) LIKE ? AND LOWER(title) LIKE ?';
+    const params = [`%${category.toLowerCase()}%`, `%${title.toLowerCase()}%`];
+
+    db.query(query, params, (err, results) => {
+        if (err) return res.status(500).json(err);
+        if (results.length === 0) return res.status(404).json({ message: 'No posts found for the given category and title.' });
+        res.json(results);
+    });
+});
+
+module.exports = router;
 
 module.exports = router;
