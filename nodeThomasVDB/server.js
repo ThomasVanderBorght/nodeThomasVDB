@@ -40,7 +40,7 @@ app.use('/posts', postRoutes);
 
 
 app.get('/', (req, res) => {
-    res.send('<h1>Welcome to the Express API</h1><p>Check API documentation at /docs</p>');
+    res.send('<h1></p>');
 });
 
 const PORT = process.env.PORT || 3000;
