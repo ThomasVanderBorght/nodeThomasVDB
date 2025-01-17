@@ -20,7 +20,7 @@ Ensure you have the following installed:
    ```bash
     git clone https://github.com/your-username/your-repo.git
 
-   
+  replace the username and repo with the correct info
   cd your-repo
    
 then install your dependencies using
